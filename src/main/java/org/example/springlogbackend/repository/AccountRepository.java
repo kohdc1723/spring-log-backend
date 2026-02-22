@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, String> {
     Optional<Account> findByUserIdAndProvider(String userId, ProviderType provider);
+    Optional<Account> findByProviderAndProviderId(ProviderType provider, String providerId);
+    void deleteAllByUserId(String userId);
 }

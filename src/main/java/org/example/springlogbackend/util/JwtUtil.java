@@ -1,6 +1,9 @@
 package org.example.springlogbackend.util;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import org.example.springlogbackend.entity.ProviderType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +50,15 @@ public class JwtUtil {
                 .get("jti", String.class);
     }
 
+    public String getProvider(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("provider", String.class);
+    }
+
     public String getEmail(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -65,50 +77,54 @@ public class JwtUtil {
                 .get("role", String.class);
     }
 
-    public boolean isAccessTokenValid(String token) {
-        String type = getType(token);
-        Date expiration = getExpiration(token);
-
-        return type.equals("access") && !expiration.before(new Date());
-    }
-
-    public boolean isRefreshTokenValid(String token) {
-        String type = getType(token);
-        Date expiration = getExpiration(token);
-
-        return type.equals("refresh") && !expiration.before(new Date());
-    }
-
-    public String createAccessToken(String userId, String email, String role) {
+    public String createToken(
+            String userId,
+            ProviderType provider,
+            String email,
+            String role,
+            JwtTokenType tokenType
+    ) {
         long now = System.currentTimeMillis();
-        long expiration = now + accessTokenExpiresIn;
+        long expiration = now + (tokenType == JwtTokenType.ACCESS ? accessTokenExpiresIn : refreshTokenExpiresIn);
 
         return Jwts.builder()
                 .subject(userId)
                 .claim("jti", UUID.randomUUID().toString())
+                .claim("provider", provider)
                 .claim("email", email)
                 .claim("role", role)
-                .claim("type", "access")
+                .claim("type", tokenType.getValue())
                 .issuedAt(new Date(now))
                 .expiration(new Date(expiration))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public String createRefreshToken(String userId, String email, String role) {
-        long now = System.currentTimeMillis();
-        long expiration = now + refreshTokenExpiresIn;
+    public boolean isValid(String token, JwtTokenType tokenType) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
-        return Jwts.builder()
-                .subject(userId)
-                .claim("jti", UUID.randomUUID().toString())
-                .claim("email", email)
-                .claim("role", role)
-                .claim("type", "refresh")
-                .issuedAt(new Date(now))
-                .expiration(new Date(expiration))
-                .signWith(secretKey)
-                .compact();
+            String type = claims.get("type", String.class);
+            Date expiration = claims.getExpiration();
+
+            if (type == null) return false;
+
+            if (tokenType == JwtTokenType.ACCESS && !type.equals(JwtTokenType.ACCESS.getValue())) {
+                return false;
+            }
+
+            if (tokenType == JwtTokenType.REFRESH && !type.equals(JwtTokenType.REFRESH.getValue())) {
+                return false;
+            }
+
+            return !expiration.before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private String getType(String token) {

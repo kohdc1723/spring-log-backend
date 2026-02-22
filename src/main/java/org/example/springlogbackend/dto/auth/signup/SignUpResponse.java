@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.response.auth;
+package org.example.springlogbackend.dto.auth.signup;
 
 import lombok.Builder;
 import org.example.springlogbackend.entity.ProviderType;

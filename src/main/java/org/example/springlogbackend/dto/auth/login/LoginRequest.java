@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.request.auth;
+package org.example.springlogbackend.dto.auth.login;
 
 public record LoginRequest(
         String email,

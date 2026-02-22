@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.response;
+package org.example.springlogbackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;

@@ -28,12 +28,9 @@ public class User {
     @Column(name = "user_id", nullable = false, updatable = false)
     private String id;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserRoleType role;

@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.request.auth;
+package org.example.springlogbackend.dto.auth.signup;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -27,7 +27,6 @@ public class Account {
     @Column(name = "account_id", nullable = false, updatable = false)
     private String id;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false, updatable = false)
     private ProviderType provider;

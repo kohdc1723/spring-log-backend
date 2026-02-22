@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.response;
+package org.example.springlogbackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
@@ -35,15 +35,11 @@ public class ErrorResponse {
         );
     }
 
-    @AllArgsConstructor
-    public static class FieldError {
-        private final String field;
-        private final String message;
-
-        public static List<FieldError> of(BindingResult bindingResult) {
-            return bindingResult.getFieldErrors().stream()
-                    .map(error -> new FieldError(error.getField(), error.getDefaultMessage()))
-                    .toList();
+    public record FieldError(String field, String message) {
+            public static List<FieldError> of(BindingResult bindingResult) {
+                return bindingResult.getFieldErrors().stream()
+                        .map(error -> new FieldError(error.getField(), error.getDefaultMessage()))
+                        .toList();
+            }
         }
-    }
 }

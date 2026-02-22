@@ -5,9 +5,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.example.springlogbackend.dto.CustomUserDetails;
+import org.example.springlogbackend.dto.auth.AccessTokenResponse;
+import org.example.springlogbackend.dto.auth.CustomUserDetails;
+import org.example.springlogbackend.entity.ProviderType;
 import org.example.springlogbackend.service.JwtService;
+import org.example.springlogbackend.util.CookieUtil;
+import org.example.springlogbackend.util.JwtTokenType;
 import org.example.springlogbackend.util.JwtUtil;
+import org.example.springlogbackend.util.SecurityResponseUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
@@ -26,6 +31,7 @@ import java.util.Map;
 public class LocalLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -40,22 +46,13 @@ public class LocalLoginSuccessHandler implements AuthenticationSuccessHandler {
         String email = userDetails.getUsername();
         String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
-        String accessToken = jwtUtil.createAccessToken(userId, email, role);
-        String refreshToken = jwtUtil.createRefreshToken(userId, email, role);
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/auth")
-                .sameSite("Strict")
-                .maxAge(Duration.ofDays(14))
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        String accessToken = jwtUtil.createToken(userId, ProviderType.LOCAL, email, role, JwtTokenType.ACCESS);
+        String refreshToken = jwtUtil.createToken(userId, ProviderType.LOCAL, email, role, JwtTokenType.REFRESH);
 
         jwtService.addRefreshToken(refreshToken);
-        Map<String, String> accessTokenResponse = Map.of("accessToken", accessToken);
-        objectMapper.writeValue(response.getWriter(), accessTokenResponse);
+        cookieUtil.setRefreshToken(response, refreshToken);
+
+        AccessTokenResponse accessTokenResponse = new AccessTokenResponse(accessToken);
+        SecurityResponseUtil.sendSuccess(response, accessTokenResponse, objectMapper);
     }
 }

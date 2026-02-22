@@ -25,7 +25,6 @@ public class RefreshToken {
     @Column(name = "refresh_token_id", nullable = false, updatable = false)
     private String id;
 
-    @NotBlank
     @Column(name = "token", nullable = false, unique = true, columnDefinition = "TEXT")
     private String token;
 
