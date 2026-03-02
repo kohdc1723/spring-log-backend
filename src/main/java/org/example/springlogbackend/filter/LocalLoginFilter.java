@@ -1,5 +1,6 @@
 package org.example.springlogbackend.filter;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.springlogbackend.dto.auth.login.LoginRequest;
@@ -28,7 +29,7 @@ public class LocalLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     public Authentication attemptAuthentication(
             HttpServletRequest request,
-            HttpServletResponse response
+            @Nonnull HttpServletResponse response
     ) throws AuthenticationException {
         try {
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);

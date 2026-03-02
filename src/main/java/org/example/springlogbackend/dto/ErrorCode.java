@@ -11,9 +11,11 @@ public enum ErrorCode {
     INVALID_AUTH_CODE(HttpStatus.UNAUTHORIZED, "Invalid Auth Code"),
     INVALID_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid JWT Token"),
 
+
     FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden"),
 
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad Request"),
+    BAD_CREDENTIALS(HttpStatus.BAD_REQUEST, "Bad Credentials"),
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User Not Found"),
 

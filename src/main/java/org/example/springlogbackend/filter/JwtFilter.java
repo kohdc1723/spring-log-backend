@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.springlogbackend.dto.ErrorCode;
+import org.example.springlogbackend.dto.auth.UserPrincipal;
+import org.example.springlogbackend.entity.ProviderType;
 import org.example.springlogbackend.util.JwtTokenType;
 import org.example.springlogbackend.util.JwtUtil;
 import org.example.springlogbackend.util.SecurityResponseUtil;
@@ -50,11 +52,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (jwtUtil.isValid(accessToken, JwtTokenType.ACCESS)) {
             String userId = jwtUtil.getSubject(accessToken);
-            String role = jwtUtil.getRole(accessToken);
+            String provider = jwtUtil.getProvider(accessToken);
+            UserPrincipal userPrincipal = UserPrincipal.builder()
+                    .userId(userId)
+                    .provider(ProviderType.valueOf(provider))
+                    .build();
 
+            String role = jwtUtil.getRole(accessToken);
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-            Authentication auth = new UsernamePasswordAuthenticationToken(userId, null, authorities);
+            Authentication auth = new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             filterChain.doFilter(request, response);

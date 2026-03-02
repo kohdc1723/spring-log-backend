@@ -5,7 +5,8 @@ import org.example.springlogbackend.repository.RefreshTokenRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -14,7 +15,7 @@ public class ScheduleConfig {
 
     @Scheduled(cron = "0 0 3 * * *")
     public void refreshTokenTtlSchedule() {
-        LocalDateTime cutoff = LocalDateTime.now().minusDays(8);
+        Instant cutoff = Instant.now().minus(8, ChronoUnit.DAYS);
         refreshTokenRepository.deleteByCreatedAtBefore(cutoff);
     }
 }

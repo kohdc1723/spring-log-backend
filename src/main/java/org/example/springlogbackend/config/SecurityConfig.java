@@ -6,7 +6,6 @@ import org.example.springlogbackend.filter.JwtFilter;
 import org.example.springlogbackend.filter.LocalLoginFilter;
 import org.example.springlogbackend.handler.*;
 import org.example.springlogbackend.service.CustomOAuth2UserService;
-import org.example.springlogbackend.service.UserService;
 import org.example.springlogbackend.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +18,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,10 +36,10 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final LocalLoginSuccessHandler localLoginSuccessHandler;
+    private final LocalLoginFailureHandler localLoginFailureHandler;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final RefreshTokenLogoutHandler refreshTokenLogoutHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
-    private final UserService userService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtUtil jwtUtil;
 
@@ -86,8 +82,7 @@ public class SecurityConfig {
                 .configurationSource(corsConfigurationSource()));
 
         http.oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo
-                        .userService(customOAuth2UserService))
+                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 .successHandler(oAuth2LoginSuccessHandler));
 
         http.sessionManagement(session -> session
@@ -97,6 +92,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasRole(UserRoleType.USER.name())
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/").hasRole(UserRoleType.USER.name())
+                .requestMatchers("/api/v1/admin/**").hasRole(UserRoleType.ADMIN.name())
                 .anyRequest().authenticated());
 
         http.addFilterAt(localLoginFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -117,6 +113,7 @@ public class SecurityConfig {
     private LocalLoginFilter localLoginFilter() {
         LocalLoginFilter filter = new LocalLoginFilter(authenticationManager(), objectMapper);
         filter.setAuthenticationSuccessHandler(localLoginSuccessHandler);
+        filter.setAuthenticationFailureHandler(localLoginFailureHandler);
 
         return filter;
     }

@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.springlogbackend.dto.auth.AccessTokenResponse;
+import org.example.springlogbackend.dto.auth.AuthUserResponse;
+import org.example.springlogbackend.dto.auth.UserPrincipal;
 import org.example.springlogbackend.dto.auth.oauth2.TokensDto;
 import org.example.springlogbackend.dto.auth.oauth2.TokenRequest;
 import org.example.springlogbackend.dto.auth.oauth2.TokenResponse;
@@ -16,10 +18,8 @@ import org.example.springlogbackend.service.UserService;
 import org.example.springlogbackend.util.CookieUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -28,6 +28,15 @@ public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
     private final CookieUtil cookieUtil;
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<AuthUserResponse>> getMeApi(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        AuthUserResponse authUserResponse = userService.getAuthUser(userPrincipal);
+
+        return ResponseEntity.ok(ApiResponse.success(authUserResponse));
+    }
 
     @PostMapping("/sign-up")
     public ResponseEntity<ApiResponse<SignUpResponse>> signUpApi(

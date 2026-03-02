@@ -22,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class JwtService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final JwtUtil jwtUtil;
     private final AuthCodeStore authCodeStore;
-    private final AccountRepository accountRepository;
 
     @Transactional
     public void addRefreshToken(String token) {
@@ -45,12 +45,12 @@ public class JwtService {
         String accountId = authCodeStore.consume(code)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.INVALID_AUTH_CODE,
-                        "Account not found with auth code: %s".formatted(code)));
+                        "Account not found with auth code(%s)".formatted(code)));
 
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.INTERNAL_SERVER_ERROR,
-                        "Account not found with id: %s".formatted(accountId)));
+                        "Account(%s) not found".formatted(accountId)));
 
         User user = account.getUser();
         String userId = user.getId();
@@ -83,7 +83,7 @@ public class JwtService {
         String role = jwtUtil.getRole(refreshToken);
         ProviderType provider = ProviderType.valueOf(jwtUtil.getProvider(refreshToken));
 
-        refreshTokenRepository.deleteByToken(refreshToken);
+//        refreshTokenRepository.deleteByToken(refreshToken);
 
         String newAccessToken = jwtUtil.createToken(userId, provider, email, role, JwtTokenType.ACCESS);
         String newRefreshToken = jwtUtil.createToken(userId, provider, email, role, JwtTokenType.REFRESH);

@@ -7,12 +7,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GithubOAuth2UserInfo implements OAuth2UserInfo {
     private final Map<String, Object> attributes;
-    private final String email;
-
-    public GithubOAuth2UserInfo(Map<String, Object> attributes) {
-        this.attributes = attributes;
-        this.email = attributes.get("email").toString();
-    }
 
     @Override
     public String getProviderId() {

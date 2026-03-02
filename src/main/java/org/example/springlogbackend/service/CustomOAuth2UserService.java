@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 throw new OAuth2AuthenticationException("GitHub primary email is required");
             }
 
-            oAuth2UserInfo = new GithubOAuth2UserInfo(oAuth2User.getAttributes(), email);
+            Map<String, Object> updatedAttributes = new HashMap<>(attributes);
+            updatedAttributes.put("email", email);
+            oAuth2UserInfo = new GithubOAuth2UserInfo(updatedAttributes);
         }
 
         Account account = processOAuth2Login(provider, oAuth2UserInfo);
@@ -58,9 +61,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private Account processOAuth2Login(ProviderType provider, OAuth2UserInfo oAuth2UserInfo) {
-        return accountRepository
+        Account account = accountRepository
                 .findByProviderAndProviderId(provider, oAuth2UserInfo.getProviderId())
                 .orElseGet(() -> linkOrCreateAccount(provider, oAuth2UserInfo));
+
+        account.updateProfileImageUrl(oAuth2UserInfo.getProfileImageUrl());
+
+        return account;
     }
 
     private Account linkOrCreateAccount(ProviderType provider, OAuth2UserInfo oAuth2UserInfo) {
@@ -73,6 +80,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .user(user)
                 .provider(provider)
                 .providerId(oAuth2UserInfo.getProviderId())
+                .profileImageUrl(oAuth2UserInfo.getProfileImageUrl())
                 .build();
 
         return accountRepository.save(account);
