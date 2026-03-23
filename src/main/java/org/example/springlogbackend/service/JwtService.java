@@ -2,7 +2,7 @@ package org.example.springlogbackend.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springlogbackend.dto.ErrorCode;
-import org.example.springlogbackend.dto.auth.oauth2.TokensDto;
+import org.example.springlogbackend.dto.auth.JwtTokenPair;
 import org.example.springlogbackend.entity.Account;
 import org.example.springlogbackend.entity.ProviderType;
 import org.example.springlogbackend.entity.RefreshToken;
@@ -43,7 +43,7 @@ public class JwtService {
     }
 
     @Transactional
-    public TokensDto generateToken(String code) {
+    public JwtTokenPair generateTokens(String code) {
         String accountId = authCodeStore.consume(code)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.INVALID_AUTH_CODE,
@@ -65,14 +65,14 @@ public class JwtService {
 
         addRefreshToken(refreshToken);
 
-        return TokensDto.builder()
+        return JwtTokenPair.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
 
     @Transactional
-    public TokensDto refresh(String token) {
+    public JwtTokenPair refresh(String token) {
         if (!jwtUtil.isValid(token, JwtTokenType.REFRESH)) {
             throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
         }
@@ -97,7 +97,7 @@ public class JwtService {
             ) {
                 String newAccessToken = jwtUtil.createToken(userId, provider, email, role, JwtTokenType.ACCESS);
 
-                return TokensDto.builder()
+                return JwtTokenPair.builder()
                         .accessToken(newAccessToken)
                         .refreshToken(refreshToken.getToken())
                         .build();
@@ -112,7 +112,7 @@ public class JwtService {
 
         refreshToken.rotate(newRefreshToken);
 
-        return TokensDto.builder()
+        return JwtTokenPair.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
                 .build();

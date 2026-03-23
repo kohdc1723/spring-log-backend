@@ -3,7 +3,7 @@ package org.example.springlogbackend.filter;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.springlogbackend.dto.auth.login.LoginRequest;
+import org.example.springlogbackend.dto.auth.request.LoginRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;

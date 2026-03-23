@@ -2,7 +2,7 @@ package org.example.springlogbackend.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springlogbackend.dto.ApiResponse;
-import org.example.springlogbackend.dto.user.UserResponse;
+import org.example.springlogbackend.dto.user.response.UserResponse;
 import org.example.springlogbackend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

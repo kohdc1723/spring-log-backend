@@ -4,7 +4,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.example.springlogbackend.dto.auth.oauth2.CustomOAuth2User;
+import org.example.springlogbackend.dto.auth.CustomOAuth2User;
 import org.example.springlogbackend.util.AuthCodeStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationServiceException;

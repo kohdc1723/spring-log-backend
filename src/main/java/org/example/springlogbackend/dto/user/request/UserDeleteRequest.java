@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.user;
+package org.example.springlogbackend.dto.user.request;
 
 import lombok.Builder;
 

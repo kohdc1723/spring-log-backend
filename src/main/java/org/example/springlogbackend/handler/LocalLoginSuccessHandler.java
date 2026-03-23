@@ -1,11 +1,10 @@
 package org.example.springlogbackend.handler;
 
 import jakarta.annotation.Nonnull;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.example.springlogbackend.dto.auth.AccessTokenResponse;
+import org.example.springlogbackend.dto.auth.response.AccessTokenResponse;
 import org.example.springlogbackend.dto.auth.CustomUserDetails;
 import org.example.springlogbackend.entity.ProviderType;
 import org.example.springlogbackend.service.JwtService;

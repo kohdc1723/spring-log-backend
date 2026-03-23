@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.refreshtoken;
+package org.example.springlogbackend.dto.auth.response;
 
 import lombok.Builder;
 

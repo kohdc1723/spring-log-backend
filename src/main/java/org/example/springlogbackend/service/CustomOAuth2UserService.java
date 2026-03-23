@@ -2,9 +2,9 @@ package org.example.springlogbackend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.springlogbackend.dto.auth.oauth2.CustomOAuth2User;
-import org.example.springlogbackend.dto.auth.oauth2.GithubOAuth2UserInfo;
-import org.example.springlogbackend.dto.auth.oauth2.OAuth2UserInfo;
+import org.example.springlogbackend.dto.auth.CustomOAuth2User;
+import org.example.springlogbackend.dto.auth.GithubOAuth2UserInfo;
+import org.example.springlogbackend.dto.auth.OAuth2UserInfo;
 import org.example.springlogbackend.entity.Account;
 import org.example.springlogbackend.entity.ProviderType;
 import org.example.springlogbackend.entity.User;

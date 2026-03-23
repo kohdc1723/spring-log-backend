@@ -1,13 +1,17 @@
-package org.example.springlogbackend.dto.auth;
+package org.example.springlogbackend.dto.auth.response;
 
 import lombok.Builder;
 import org.example.springlogbackend.entity.ProviderType;
 import org.example.springlogbackend.entity.UserRoleType;
 
+import java.time.Instant;
+
 @Builder
-public record AuthUserResponse(
+public record SignUpResponse(
+        String id,
         String email,
         UserRoleType role,
         ProviderType provider,
-        String profileImageUrl
-) {}
+        Instant createdAt
+) {
+}

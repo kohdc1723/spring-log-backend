@@ -1,8 +1,8 @@
-package org.example.springlogbackend.dto.user;
+package org.example.springlogbackend.dto.user.response;
 
 import lombok.Builder;
-import org.example.springlogbackend.dto.account.AccountResponse;
-import org.example.springlogbackend.dto.refreshtoken.RefreshTokenResponse;
+import org.example.springlogbackend.dto.auth.response.AccountResponse;
+import org.example.springlogbackend.dto.auth.response.RefreshTokenResponse;
 import org.example.springlogbackend.entity.UserRoleType;
 
 import java.time.Instant;

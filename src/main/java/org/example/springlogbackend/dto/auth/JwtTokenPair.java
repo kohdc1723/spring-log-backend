@@ -1,9 +1,9 @@
-package org.example.springlogbackend.dto.auth.oauth2;
+package org.example.springlogbackend.dto.auth;
 
 import lombok.Builder;
 
 @Builder
-public record TokensDto(
+public record JwtTokenPair(
         String accessToken,
         String refreshToken
 ) {}

@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.auth.oauth2;
+package org.example.springlogbackend.dto.auth;
 
 import org.example.springlogbackend.entity.ProviderType;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;

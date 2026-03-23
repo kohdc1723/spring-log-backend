@@ -1,4 +1,4 @@
-package org.example.springlogbackend.dto.auth.oauth2;
+package org.example.springlogbackend.dto.auth;
 
 import jakarta.annotation.Nonnull;
 import lombok.Getter;

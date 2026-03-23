@@ -6,12 +6,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.springlogbackend.dto.ErrorCode;
 import org.example.springlogbackend.dto.auth.*;
-import org.example.springlogbackend.dto.auth.oauth2.TokensDto;
-import org.example.springlogbackend.dto.auth.oauth2.TokenRequest;
-import org.example.springlogbackend.dto.auth.oauth2.TokenResponse;
-import org.example.springlogbackend.dto.auth.signup.SignUpRequest;
+import org.example.springlogbackend.dto.auth.JwtTokenPair;
+import org.example.springlogbackend.dto.auth.request.TokenRequest;
+import org.example.springlogbackend.dto.auth.request.ForgotPasswordRequest;
+import org.example.springlogbackend.dto.auth.request.ResendVerificationEmailRequest;
+import org.example.springlogbackend.dto.auth.request.ResetPasswordRequest;
+import org.example.springlogbackend.dto.auth.response.AccessTokenResponse;
+import org.example.springlogbackend.dto.auth.response.AuthUserResponse;
+import org.example.springlogbackend.dto.auth.request.SignUpRequest;
 import org.example.springlogbackend.dto.ApiResponse;
-import org.example.springlogbackend.dto.auth.signup.SignUpResponse;
+import org.example.springlogbackend.dto.auth.response.SignUpResponse;
 import org.example.springlogbackend.exception.BusinessException;
 import org.example.springlogbackend.service.EmailVerificationService;
 import org.example.springlogbackend.service.JwtService;
@@ -61,19 +65,19 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<ApiResponse<TokenResponse>> tokenApi(
+    public ResponseEntity<ApiResponse<AccessTokenResponse>> tokenApi(
             @RequestBody @Valid TokenRequest tokenRequest,
             HttpServletResponse response
     ) {
-        TokensDto tokens = jwtService.generateToken(tokenRequest.code());
+        JwtTokenPair tokens = jwtService.generateTokens(tokenRequest.code());
 
         cookieUtil.setRefreshToken(response, tokens.refreshToken());
 
-        TokenResponse tokenResponse = TokenResponse.builder()
+        AccessTokenResponse accessTokenResponse = AccessTokenResponse.builder()
                 .accessToken(tokens.accessToken())
                 .build();
 
-        return ResponseEntity.ok(ApiResponse.success(tokenResponse));
+        return ResponseEntity.ok(ApiResponse.success(accessTokenResponse));
     }
 
     @PostMapping("/refresh")
@@ -87,7 +91,7 @@ public class AuthController {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
-        TokensDto tokens = jwtService.refresh(refreshToken);
+        JwtTokenPair tokens = jwtService.refresh(refreshToken);
 
         cookieUtil.setRefreshToken(response, tokens.refreshToken());
 
