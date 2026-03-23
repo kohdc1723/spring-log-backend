@@ -12,37 +12,28 @@ import java.time.Instant;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "refresh_tokens")
+@Table(name = "password_reset_tokens")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RefreshToken {
+public class PasswordResetToken {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "refresh_token_id", nullable = false, updatable = false)
+    @Column(name = "password_reset_token_id", nullable = false, updatable = false)
     private String id;
 
-    @Column(name = "token", nullable = false, unique = true, columnDefinition = "TEXT")
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
-
-    @Column(name = "prev_token", columnDefinition = "TEXT")
-    private String prevToken;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
+    @Column(name = "expires_at", nullable = false)
+    private Instant expiresAt;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
-
-    @Column(name = "rotated_at")
-    private Instant rotatedAt;
-
-    public void rotate(String newToken) {
-        this.prevToken = this.token;
-        this.token = newToken;
-        this.rotatedAt = Instant.now();
-    }
 }

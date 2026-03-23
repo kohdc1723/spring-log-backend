@@ -55,4 +55,8 @@ public class Account {
     public void updateProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

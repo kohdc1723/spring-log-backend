@@ -2,12 +2,15 @@ package org.example.springlogbackend.service;
 
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
+import org.example.springlogbackend.dto.ErrorCode;
 import org.example.springlogbackend.dto.auth.CustomUserDetails;
 import org.example.springlogbackend.entity.Account;
 import org.example.springlogbackend.entity.ProviderType;
 import org.example.springlogbackend.entity.User;
+import org.example.springlogbackend.exception.BusinessException;
 import org.example.springlogbackend.repository.AccountRepository;
 import org.example.springlogbackend.repository.UserRepository;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -2,7 +2,6 @@ package org.example.springlogbackend.util;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.example.springlogbackend.entity.ProviderType;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;

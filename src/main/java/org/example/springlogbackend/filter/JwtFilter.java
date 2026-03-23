@@ -51,20 +51,24 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = authorization.split(" ")[1];
 
         if (jwtUtil.isValid(accessToken, JwtTokenType.ACCESS)) {
-            String userId = jwtUtil.getSubject(accessToken);
-            String provider = jwtUtil.getProvider(accessToken);
-            UserPrincipal userPrincipal = UserPrincipal.builder()
-                    .userId(userId)
-                    .provider(ProviderType.valueOf(provider))
-                    .build();
+            try {
+                String userId = jwtUtil.getSubject(accessToken);
+                String provider = jwtUtil.getProvider(accessToken);
+                UserPrincipal userPrincipal = UserPrincipal.builder()
+                        .userId(userId)
+                        .provider(ProviderType.valueOf(provider))
+                        .build();
 
-            String role = jwtUtil.getRole(accessToken);
-            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+                String role = jwtUtil.getRole(accessToken);
+                List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-            Authentication auth = new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                Authentication auth = new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(auth);
 
-            filterChain.doFilter(request, response);
+                filterChain.doFilter(request, response);
+            } catch (Exception e) {
+                SecurityResponseUtil.sendError(response, ErrorCode.INVALID_JWT_TOKEN, objectMapper);
+            }
         } else {
             SecurityResponseUtil.sendError(response, ErrorCode.INVALID_JWT_TOKEN, objectMapper);
         }

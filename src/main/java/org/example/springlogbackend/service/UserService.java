@@ -9,10 +9,7 @@ import org.example.springlogbackend.dto.auth.signup.SignUpResponse;
 import org.example.springlogbackend.dto.refreshtoken.RefreshTokenResponse;
 import org.example.springlogbackend.dto.auth.AuthUserResponse;
 import org.example.springlogbackend.dto.user.UserResponse;
-import org.example.springlogbackend.entity.Account;
-import org.example.springlogbackend.entity.ProviderType;
-import org.example.springlogbackend.entity.User;
-import org.example.springlogbackend.entity.UserRoleType;
+import org.example.springlogbackend.entity.*;
 import org.example.springlogbackend.exception.BusinessException;
 import org.example.springlogbackend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +24,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
     @Transactional
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
@@ -58,6 +56,8 @@ public class UserService {
         user.getAccounts().add(account);
 
         userRepository.save(user);
+
+        emailVerificationService.sendVerificationEmail(user);
 
         return SignUpResponse.builder()
                 .id(user.getId())
@@ -116,7 +116,11 @@ public class UserService {
                         )
                         .refreshTokens(user.getRefreshTokens().stream()
                                 .map(rt -> RefreshTokenResponse.builder()
+                                        .id(rt.getId())
                                         .token(rt.getToken())
+                                        .prevToken(rt.getPrevToken())
+                                        .rotatedAt(rt.getRotatedAt())
+                                        .createdAt(rt.getCreatedAt())
                                         .build()
                                 )
                                 .toList()

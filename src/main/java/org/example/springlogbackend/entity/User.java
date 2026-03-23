@@ -38,6 +38,10 @@ public class User {
     @Builder.Default
     private boolean deleted = false;
 
+    @Column(name = "email_verified")
+    @Builder.Default
+    private boolean emailVerified = false;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -61,5 +65,9 @@ public class User {
         this.email = "deleted@" + System.currentTimeMillis() + "_" + this.email;
         this.accounts.clear();
         this.refreshTokens.clear();
+    }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
     }
 }

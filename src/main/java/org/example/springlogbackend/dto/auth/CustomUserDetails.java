@@ -43,4 +43,9 @@ public class CustomUserDetails implements UserDetails {
     public String getAccountId() {
         return account.getId();
     }
+
+    @Override
+    public boolean isEnabled() {
+        return user.isEmailVerified();
+    }
 }

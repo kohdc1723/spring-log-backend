@@ -17,6 +17,8 @@ import org.example.springlogbackend.util.JwtUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -70,25 +72,45 @@ public class JwtService {
     }
 
     @Transactional
-    public TokensDto refresh(String refreshToken) {
-        if (!jwtUtil.isValid(refreshToken, JwtTokenType.REFRESH)) {
+    public TokensDto refresh(String token) {
+        if (!jwtUtil.isValid(token, JwtTokenType.REFRESH)) {
             throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
         }
 
-        refreshTokenRepository.findByToken(refreshToken)
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenOrPrevToken(token, token)
                 .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
 
-        String userId = jwtUtil.getSubject(refreshToken);
-        String email = jwtUtil.getEmail(refreshToken);
-        String role = jwtUtil.getRole(refreshToken);
-        ProviderType provider = ProviderType.valueOf(jwtUtil.getProvider(refreshToken));
+        String userId = jwtUtil.getSubject(token);
+        String email = jwtUtil.getEmail(token);
+        String role = jwtUtil.getRole(token);
+        ProviderType provider = null;
 
-//        refreshTokenRepository.deleteByToken(refreshToken);
+        try {
+            provider = ProviderType.valueOf(jwtUtil.getProvider(token));
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
+        }
+
+        if (token.equals(refreshToken.getPrevToken())) {
+            if (refreshToken.getRotatedAt() != null &&
+                    refreshToken.getRotatedAt().isAfter(Instant.now().minusSeconds(10))
+            ) {
+                String newAccessToken = jwtUtil.createToken(userId, provider, email, role, JwtTokenType.ACCESS);
+
+                return TokensDto.builder()
+                        .accessToken(newAccessToken)
+                        .refreshToken(refreshToken.getToken())
+                        .build();
+            } else {
+                refreshTokenRepository.delete(refreshToken);
+                throw new BusinessException(ErrorCode.UNAUTHORIZED);
+            }
+        }
 
         String newAccessToken = jwtUtil.createToken(userId, provider, email, role, JwtTokenType.ACCESS);
         String newRefreshToken = jwtUtil.createToken(userId, provider, email, role, JwtTokenType.REFRESH);
 
-        addRefreshToken(newRefreshToken);
+        refreshToken.rotate(newRefreshToken);
 
         return TokensDto.builder()
                 .accessToken(newAccessToken)

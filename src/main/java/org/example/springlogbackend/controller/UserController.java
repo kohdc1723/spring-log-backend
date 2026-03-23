@@ -2,12 +2,9 @@ package org.example.springlogbackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springlogbackend.dto.ApiResponse;
-import org.example.springlogbackend.dto.auth.UserPrincipal;
-import org.example.springlogbackend.dto.auth.AuthUserResponse;
 import org.example.springlogbackend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

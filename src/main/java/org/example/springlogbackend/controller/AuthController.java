@@ -4,16 +4,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.springlogbackend.dto.auth.AccessTokenResponse;
-import org.example.springlogbackend.dto.auth.AuthUserResponse;
-import org.example.springlogbackend.dto.auth.UserPrincipal;
+import org.example.springlogbackend.dto.ErrorCode;
+import org.example.springlogbackend.dto.auth.*;
 import org.example.springlogbackend.dto.auth.oauth2.TokensDto;
 import org.example.springlogbackend.dto.auth.oauth2.TokenRequest;
 import org.example.springlogbackend.dto.auth.oauth2.TokenResponse;
 import org.example.springlogbackend.dto.auth.signup.SignUpRequest;
 import org.example.springlogbackend.dto.ApiResponse;
 import org.example.springlogbackend.dto.auth.signup.SignUpResponse;
+import org.example.springlogbackend.exception.BusinessException;
+import org.example.springlogbackend.service.EmailVerificationService;
 import org.example.springlogbackend.service.JwtService;
+import org.example.springlogbackend.service.PasswordResetService;
 import org.example.springlogbackend.service.UserService;
 import org.example.springlogbackend.util.CookieUtil;
 import org.springframework.http.HttpStatus;
@@ -26,8 +28,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
+    private final EmailVerificationService emailVerificationService;
     private final JwtService jwtService;
     private final CookieUtil cookieUtil;
+    private final PasswordResetService passwordResetService;
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<AuthUserResponse>> getMeApi(
@@ -36,6 +40,13 @@ public class AuthController {
         AuthUserResponse authUserResponse = userService.getAuthUser(userPrincipal);
 
         return ResponseEntity.ok(ApiResponse.success(authUserResponse));
+    }
+
+    @GetMapping("/email-verification")
+    public ResponseEntity<ApiResponse<Void>> verifyEmailApi(@RequestParam String token) {
+        emailVerificationService.verifyEmail(token);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/sign-up")
@@ -72,6 +83,10 @@ public class AuthController {
     ) {
         String refreshToken = cookieUtil.getRefreshToken(request);
 
+        if (refreshToken == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+
         TokensDto tokens = jwtService.refresh(refreshToken);
 
         cookieUtil.setRefreshToken(response, tokens.refreshToken());
@@ -79,5 +94,32 @@ public class AuthController {
         AccessTokenResponse accessTokenResponse = new AccessTokenResponse(tokens.accessToken());
 
         return ResponseEntity.ok(ApiResponse.success(accessTokenResponse));
+    }
+
+    @PostMapping("/resend-verification-email")
+    public ResponseEntity<ApiResponse<Void>> resendEmailVerificationApi(
+            @RequestBody @Valid ResendVerificationEmailRequest request
+    ) {
+        emailVerificationService.resendVerificationEmail(request.email());
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPasswordApi(
+            @RequestBody @Valid ForgotPasswordRequest request
+    ) {
+        passwordResetService.sendPasswordResetEmail(request.email());
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPasswordApi(
+            @RequestBody @Valid ResetPasswordRequest request
+    ) {
+        passwordResetService.resetPassword(request.token(), request.newPassword());
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

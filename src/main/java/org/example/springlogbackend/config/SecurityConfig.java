@@ -90,6 +90,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/auth/email-verification").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasRole(UserRoleType.USER.name())
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/").hasRole(UserRoleType.USER.name())
                 .requestMatchers("/api/v1/admin/**").hasRole(UserRoleType.ADMIN.name())

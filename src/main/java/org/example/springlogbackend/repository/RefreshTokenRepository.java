@@ -7,8 +7,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
-    void deleteAllByUserId(String userId);
-    void deleteByToken(String token);
     void deleteByCreatedAtBefore(Instant createdAt);
     Optional<RefreshToken> findByToken(String token);
+    Optional<RefreshToken> findByTokenOrPrevToken(String token, String prevToken);
 }

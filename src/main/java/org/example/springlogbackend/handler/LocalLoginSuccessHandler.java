@@ -13,6 +13,7 @@ import org.example.springlogbackend.util.CookieUtil;
 import org.example.springlogbackend.util.JwtTokenType;
 import org.example.springlogbackend.util.JwtUtil;
 import org.example.springlogbackend.util.SecurityResponseUtil;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,10 @@ public class LocalLoginSuccessHandler implements AuthenticationSuccessHandler {
             @Nonnull HttpServletRequest request,
             @Nonnull HttpServletResponse response,
             Authentication authentication
-    ) throws IOException, ServletException {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    ) throws IOException {
+        if (!(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            throw new AuthenticationServiceException("Unexpected principal type");
+        }
 
         String userId = userDetails.getUserId();
         String email = userDetails.getUsername();
