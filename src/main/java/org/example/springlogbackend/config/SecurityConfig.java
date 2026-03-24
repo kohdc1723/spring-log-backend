@@ -93,6 +93,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/auth/email-verification").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasRole(UserRoleType.USER.name())
