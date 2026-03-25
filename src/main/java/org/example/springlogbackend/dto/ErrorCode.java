@@ -30,6 +30,7 @@ public enum ErrorCode {
     // 429
     TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "Too Many Requests"),
     // 500
+    EMAIL_SEND_ERROR(HttpStatus.BAD_REQUEST, "Email Send Error"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
 
     private final HttpStatus httpStatus;
