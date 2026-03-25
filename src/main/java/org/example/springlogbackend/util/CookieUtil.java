@@ -16,6 +16,9 @@ public class CookieUtil {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh-token";
     private static final String COOKIE_PATH = "/api/v1/auth";
 
+    @Value("${COOKIE_SAME_SITE}")
+    private String cookieSameSite;
+
     @Value("${JWT_REFRESH_TOKEN_EXPIRATION}")
     private long refreshTokenExpiration;
 
@@ -24,7 +27,7 @@ public class CookieUtil {
                 .httpOnly(true)
                 .secure(true)
                 .path(COOKIE_PATH)
-                .sameSite("Strict")
+                .sameSite(cookieSameSite)
                 .maxAge(Duration.ofMillis(refreshTokenExpiration))
                 .build();
 
@@ -48,7 +51,7 @@ public class CookieUtil {
                 .httpOnly(true)
                 .secure(true)
                 .path(COOKIE_PATH)
-                .sameSite("Strict")
+                .sameSite(cookieSameSite)
                 .maxAge(0)
                 .build();
 
